@@ -1,23 +1,35 @@
 from dataclasses import dataclass
-import requests as req
 from requests import RequestException
+import requests as req
+import argparse
 
 
-@dataclass
 class ConnectionInstance:
-    address: str
-
-    def check_site(self):
-        try:
-            resp = req.get(self.address)
-            respcode = ''.join(i for i in str(resp) if i.isdigit())
-            print(respcode)
-            if respcode == "200":
-                print(f"Site {self.address} is up")
-            return resp
-        except RequestException:
-            print("site is not working")
+    serverstate: str
+    def test_connection(self, serveraddress):
+            with req.Session() as currsession:
+                try:
+                    currrequest = currsession.get(serveraddress)
+                    if 200 <= int(''.join(i for i in str(currrequest) if i.isdigit())) < 300:
+                        self.serverstate = "up"
+                except RequestException:
+                    self.serverstate = "down"
+            print(f"{serveraddress} is {self.serverstate}")
 
 if __name__ == '__main__':
-    conn1 = ConnectionInstance("https://www.gdadoogle.com")
-    conn1.check_site()
+    my_parser = argparse.ArgumentParser(description="Enter website to check", prefix_chars='-')
+    my_parser.add_argument('site')
+    my_parser.add_argument('-two',
+                           action='store',
+                           help='allows to pass more than one website to check')
+    parsedargs = my_parser.parse_args()
+
+    if parsedargs.two is not None:
+        server1 = ConnectionInstance()
+        server2 = ConnectionInstance()
+        server1.test_connection(parsedargs.site)
+        server2.test_connection(parsedargs.two)
+    else:
+        server1 = ConnectionInstance()
+        server1.test_connection(parsedargs.site)
+
