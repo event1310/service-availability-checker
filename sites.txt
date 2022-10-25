@@ -1,0 +1,6 @@
+https://google.com
+www.facebook.com
+http://linkedin.com
+htt://zasda.com
+something.pl
+https://google.notavalidsite
