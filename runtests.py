@@ -1,4 +1,3 @@
-from tests import test_servicechecker
 from tests.test_servicechecker import *
 
 if __name__ == '__main__':

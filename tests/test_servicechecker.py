@@ -7,24 +7,22 @@ invalidtestaddress = "http://notworkingsite.notworkingsite"
 invalidformattestaddress = "google.com"
 
 
-def mock_single_argument_parser(firstsite: str):
-    parsedargs = {'site': firstsite}
-    return checker.process_site(parsedargs['site'])
+def mock_single_argument_parser(firstsite: str) -> dict:
+    return {firstsite: checker.process_site(firstsite)}
 
 
-def mock_multiple_argument_parser(firstsite: str, secondsite: str):
-    parsedargs = {'site': firstsite, 'two': secondsite}
-    return checker.process_site(parsedargs['site']) and checker.process_sites_from_file(parsedargs['two'])
+def mock_multiple_argument_parser(*args: str) -> dict:
+    return {site: checker.process_site(site) for site in args}
 
 
-def mock_process_sites_from_file(currserver: str, sitesstatuses: dict):
+def mock_process_sites_from_file(currserver: str, sitesstatuses: dict) -> None:
     currserver = currserver.strip('\n')
     if len(currserver) > 3:
         classinstance = checker.ConnectionInstance()
         sitesstatuses[currserver] = classinstance.test_connection(currserver)
 
 
-def mock_file_argument_parser(mocktests: str):
+def mock_file_argument_parser(mocktests: str) -> str:
     with open(mocktests, 'r') as txtfile:
         servers = txtfile.readlines()
         sitesstatuses = {}
@@ -33,32 +31,35 @@ def mock_file_argument_parser(mocktests: str):
 
         return mock_convert_to_JSON(sitesstatuses)
 
-def mock_convert_to_JSON(sitesstatuses: dict):
+
+def mock_convert_to_JSON(sitesstatuses: dict) -> str:
     return json.dumps(sitesstatuses)
 
 
 def test_single_valid_connection():
-    serversstatus = mock_single_argument_parser(validtestaddress)
-    assert serversstatus[validtestaddress] == "up"
+    output = mock_single_argument_parser(validtestaddress)
+    assert output[validtestaddress] == "up"
 
 
 def test_single_invalid_connection():
-    serversstatus = mock_single_argument_parser(invalidtestaddress)
-    assert serversstatus[invalidtestaddress] == "down"
+    output = mock_single_argument_parser(invalidtestaddress)
+    assert output[invalidtestaddress] == "down"
 
 
 def test_multiple_valid_two_connections():
-    serversstatus = mock_multiple_argument_parser(validtestaddress, validtestaddress2)
-    assert serversstatus[validtestaddress] == "up" and serversstatus[validtestaddress2] == "up"
+    output = mock_multiple_argument_parser(validtestaddress, validtestaddress2)
+    assert output[validtestaddress] == "up" and output[validtestaddress2] == "up"
 
 
 def test_multiple_invalid_one_connection():
-    serversstatus = mock_multiple_argument_parser(validtestaddress, invalidtestaddress)
-    assert serversstatus[validtestaddress] == "up" and serversstatus[invalidtestaddress] == "down"
+    output = mock_multiple_argument_parser(validtestaddress, invalidtestaddress)
+    assert output[validtestaddress] == "up" and output[invalidtestaddress] == "down"
+
 
 def test_multiple_invalid_one_input():
-    serversstatus = mock_multiple_argument_parser(validtestaddress, invalidformattestaddress)
-    assert serversstatus[validtestaddress] == "up" and serversstatus[invalidformattestaddress] == "invalid_input"
+    output = mock_multiple_argument_parser(validtestaddress, invalidformattestaddress)
+    assert output[validtestaddress] == "up" and output[invalidformattestaddress] == "invalid_input"
+
 
 def test_connection_to_server_from_textfile():
     testservers = 'tests/mock_servers_file.txt'

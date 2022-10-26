@@ -2,7 +2,7 @@ import argparse
 import json
 import requests as req
 from requests import RequestException
-import database
+import db.database as database
 
 
 class ConnectionInstance:
@@ -24,7 +24,7 @@ class ConnectionInstance:
 
 def process_site(site):
     instancesstatuses = {}
-    print(site)
+    #print(site)
     if site.startswith('http://') or site.startswith('https://'):
         classInstance = ConnectionInstance()
         instancesstatuses[site] = classInstance.test_connection(site)
@@ -32,7 +32,7 @@ def process_site(site):
         print(f"{site} is not a valid site starting with https:// or http://")
         instancesstatuses[site] = 'invalid_input'
     #print(json.dumps(instancesstatuses))
-    return instancesstatuses
+    return instancesstatuses[site]
 
 
 def process_sites_from_file(servers):
@@ -47,7 +47,7 @@ def process_sites_from_file(servers):
                 instancestatuses.append(instancestatus)
 
 
-    print(json.dumps(instancestatuses))
+    #print(json.dumps(instancestatuses))
     return instancestatuses
 
 
@@ -94,7 +94,8 @@ def parse_args():
             db.close()
 
     elif parsedargs.site:
-        result = process_site(parsedargs.site)
+        result = {parsedargs.site: process_site(parsedargs.site)}
+        print(result)
         if parsedargs.db:
             db = database.Database()
             db.connect()
