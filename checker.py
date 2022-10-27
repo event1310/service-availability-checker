@@ -31,7 +31,7 @@ def process_site(site):
     else:
         print(f"{site} is not a valid site starting with https:// or http://")
         instancesstatuses[site] = 'invalid_input'
-    #print(json.dumps(instancesstatuses))
+    print(json.dumps(instancesstatuses))
     return instancesstatuses[site]
 
 
@@ -47,7 +47,7 @@ def process_sites_from_file(servers):
                 instancestatuses.append(instancestatus)
 
 
-    #print(json.dumps(instancestatuses))
+    print(json.dumps(instancestatuses))
     return instancestatuses
 
 

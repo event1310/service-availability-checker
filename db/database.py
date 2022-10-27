@@ -25,12 +25,12 @@ class Database:
                 self.conn.close()
                 print('Database connection closed.')
 
-    def save(self, serverstatus):
+    def save(self, serverstatus: dict):
         for k, v in serverstatus.items():
-            self.cursor.execute(f"insert into servers (address, status) values ('{k}', '{v}')")
+            self.cursor.execute(f"insert into servers (site, status) values ('{k}', '{v}')")
             self.conn.commit()
 
-    def save_many(self, serverstatuslist):
+    def save_many(self, serverstatuslist: list):
         for server in serverstatuslist:
             self.save(server)
 
