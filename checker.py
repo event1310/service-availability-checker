@@ -3,6 +3,7 @@ import json
 import requests as req
 from requests import RequestException
 import db.database as database
+from concurrent.futures import ThreadPoolExecutor
 
 
 class ConnectionInstance:
@@ -28,35 +29,38 @@ def process_site(site):
     if site.startswith('http://') or site.startswith('https://'):
         classInstance = ConnectionInstance()
         instancesstatuses[site] = classInstance.test_connection(site)
-    else:
-        print(f"{site} is not a valid site starting with https:// or http://")
-        instancesstatuses[site] = 'invalid_input'
-    print(json.dumps(instancesstatuses))
+
+    #print(json.dumps(instancesstatuses))
     return instancesstatuses[site]
 
-
-def process_sites_from_file(servers):
+def appendtoinstancestatus(server):
     instancestatuses = []
-    for server in servers:
-        if check_site_validity(server):
-            instancestatus = {}
-            server = server.strip('\n')
-            if len(server) > 3:
-                classInstance = ConnectionInstance()
-                instancestatus[server] = classInstance.test_connection(server)
-                instancestatuses.append(instancestatus)
+    if check_site_validity(server):
+        instancestatus = {}
+        server = server.strip('\n')
+        if len(server) > 3:
+            classInstance = ConnectionInstance()
+            instancestatus[server] = classInstance.test_connection(server)
+            instancestatuses.append(instancestatus)
 
-
-    print(json.dumps(instancestatuses))
+    #print(json.dumps(instancestatuses))
     return instancestatuses
+def process_sites_from_file(servers, txtfilelen = 0):
+    retval = []
+    with ThreadPoolExecutor(txtfilelen) as executor:
+        for result in executor.map(appendtoinstancestatus, servers):
+            if len(result) > 0:
+                retval.append(result)
 
+    return retval
 
 def check_site_validity(site):
     if site.startswith('http://') or site.startswith('https://'):
-        return site
+        return True
     else:
-        print(f"{site} is not a valid site starting with https:// or http://")
-        return
+        print(f"invalid site format for {site}")
+        #print(f"{site} is not a valid site starting with https:// or http://")
+        return False
 
 
 def parse_args():
@@ -76,7 +80,9 @@ def parse_args():
     argv = vars(parsedargs)
     if parsedargs.l:
         sites = parsedargs.l
-        result = process_sites_from_file(sites)
+        sitesamount = len(sites)
+        result = process_sites_from_file(sites, sitesamount)
+        print(result)
         if parsedargs.db:
             db = database.Database()
             db.connect()
@@ -86,7 +92,9 @@ def parse_args():
     elif parsedargs.f:
         txtfile = parsedargs.f
         lines = txtfile.readlines()
-        result = process_sites_from_file(lines)
+        txtfilelen = len(lines)
+        result = process_sites_from_file(lines, txtfilelen)
+        print(result)
         if parsedargs.db:
             db = database.Database()
             db.connect()
