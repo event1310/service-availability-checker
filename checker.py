@@ -34,22 +34,20 @@ def process_site(site):
     return instancesstatuses[site]
 
 def appendtoinstancestatus(server):
-    instancestatuses = []
     if check_site_validity(server):
         instancestatus = {}
         server = server.strip('\n')
         if len(server) > 3:
             classInstance = ConnectionInstance()
             instancestatus[server] = classInstance.test_connection(server)
-            instancestatuses.append(instancestatus)
+            return {server: instancestatus[server]}
 
     #print(json.dumps(instancestatuses))
-    return instancestatuses
 def process_sites_from_file(servers, txtfilelen = 0):
     retval = []
     with ThreadPoolExecutor(txtfilelen) as executor:
         for result in executor.map(appendtoinstancestatus, servers):
-            if len(result) > 0:
+            if result:
                 retval.append(result)
 
     return retval
