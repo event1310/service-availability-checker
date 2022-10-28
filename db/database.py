@@ -12,13 +12,10 @@ class Database:
         """ Connect to the PostgreSQL database server """
         try:
             self.params = config()
-            print('Connecting to the PostgreSQL database...')
+            print('Connecting to the database...')
             self.conn = psycopg2.connect(**self.params)
             self.cursor = self.conn.cursor()
-            print('PostgreSQL database version:')
-            self.cursor.execute('SELECT version()')
-            db_version = self.cursor.fetchone()
-            print(db_version)
+            print('Connected')
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
             if self.conn is not None:
@@ -29,6 +26,7 @@ class Database:
         for k, v in serverstatus.items():
             self.cursor.execute(f"insert into servers (site, status) values ('{k}', '{v}')")
             self.conn.commit()
+            print(f"'{k}': '{v}' has been added to db")
 
     def save_many(self, serverstatuslist: list):
         for server in serverstatuslist:
