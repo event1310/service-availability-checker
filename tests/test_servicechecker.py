@@ -1,70 +1,72 @@
-import json
-import checker
+import pytest
+import website_status_checker
+from website_status_checker import process_single_url, check_address_validity
 
 validtestaddress = "https://google.com"
 validtestaddress2 = "http://facebook.com"
 invalidtestaddress = "http://notworkingsite.notworkingsite"
-invalidformattestaddress = "google.com"
+invalidformattestaddress = "awdadad"
 
 
 def mock_single_argument_parser(firstsite: str) -> dict:
-    return {firstsite: checker.process_site(firstsite)}
+    return process_single_url(firstsite)
 
 
 def mock_multiple_argument_parser(*args: str) -> dict:
-    return {site: checker.process_site(site) for site in args}
+    return {site: process_single_url(site) for site in args}
 
 
-def mock_process_sites_from_file(currserver: str, sitesstatuses: dict) -> None:
-    currserver = currserver.strip('\n')
-    if len(currserver) > 3:
-        classinstance = checker.ConnectionInstance()
-        sitesstatuses[currserver] = classinstance.test_connection(currserver)
+def mock_process_sites_from_file(currserver: str) -> dict:
+    validserver = check_address_validity(currserver.strip('\n'))
+    if len(currserver) > 3 and validserver:
+        classinstance = website_status_checker.ConnectionInstance()
+        return {currserver: classinstance.send_GET_request(validserver)}
 
 
-def mock_file_argument_parser(mocktests: str) -> str:
+def mock_file_argument_parser(mocktests: str) -> list:
+    retval = []
     with open(mocktests, 'r') as txtfile:
         servers = txtfile.readlines()
-        sitesstatuses = {}
-        for server in servers:
-            mock_process_sites_from_file(server, sitesstatuses)
+        try:
+            for server in servers:
+                server = website_status_checker.check_address_validity(server)
+                retval.append(mock_process_sites_from_file(server))
 
-        return mock_convert_to_JSON(sitesstatuses)
+        except:
+            pass
+        return retval
 
 
-def mock_convert_to_JSON(sitesstatuses: dict) -> str:
-    return json.dumps(sitesstatuses)
-
-
-def test_single_valid_connection():
+@pytest.mark.websitestatus
+def test_single_valid_url():
     output = mock_single_argument_parser(validtestaddress)
-    assert output[validtestaddress] == "up"
+    assert output == {validtestaddress: 'up'}
 
-
-def test_single_invalid_connection():
+@pytest.mark.websitestatus
+def test_single_invalid_url():
     output = mock_single_argument_parser(invalidtestaddress)
-    assert output[invalidtestaddress] == "down"
+    assert output == {invalidtestaddress: 'down'}
 
-
-def test_multiple_valid_two_connections():
+@pytest.mark.websitestatus
+def test_multiple_valid_two_url():
     output = mock_multiple_argument_parser(validtestaddress, validtestaddress2)
-    assert output[validtestaddress] == "up" and output[validtestaddress2] == "up"
+    assert output[validtestaddress] == {validtestaddress: 'up'} \
+           and output[validtestaddress2] == {validtestaddress2: 'up'}
 
-
-def test_multiple_invalid_one_connection():
+@pytest.mark.websitestatus
+def test_multiple_one_invalid_url():
     output = mock_multiple_argument_parser(validtestaddress, invalidtestaddress)
-    assert output[validtestaddress] == "up" and output[invalidtestaddress] == "down"
+    assert output[validtestaddress] == {validtestaddress: 'up'} \
+           and output[invalidtestaddress] == {invalidtestaddress: 'down'}
 
-
-def test_multiple_invalid_one_input():
+@pytest.mark.websitestatus
+def test_multiple_one_invalidformat_url():
     output = mock_multiple_argument_parser(validtestaddress, invalidformattestaddress)
-    assert output[validtestaddress] == "up" and output[invalidformattestaddress] == "invalid_input"
+    assert output[validtestaddress] == {validtestaddress: 'up'}
 
-
-def test_connection_to_server_from_textfile():
+@pytest.mark.websitestatus
+def test_multiple_url_extfile():
     testservers = 'tests/mock_servers_file.txt'
-    testserverstatus = str(mock_file_argument_parser(testservers))
-    expectedteststatus = '{"https://google.com": "up",' \
-                         ' "http://invalidsite.invalidsite": "down",' \
-                         ' "123.999.92.255": "down"}'
-    assert testserverstatus == expectedteststatus
+    testserverstatus = mock_file_argument_parser(testservers)
+    assert testserverstatus[0] == {'https://google.com': 'up'} \
+            and testserverstatus[1] == {'http://invalidsite.invalidsite': 'down'}
