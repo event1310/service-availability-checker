@@ -3,20 +3,21 @@ from website_status_checker import process_single_url, process_multiple_urls
 from db import database
 
 def parse_args():
-    argument_parser = argparse.ArgumentParser(description="Enter website to check", prefix_chars='-')
+    argument_parser = argparse.ArgumentParser(description="Enter url to check", prefix_chars='-')
     argument_parser.add_argument('-site',
-                           action='store')
+                                 action='store')
     argument_parser.add_argument('-l',
-                           nargs='*',
-                           action='store',
-                           help='allows to pass more than one website to check')
+                                 nargs='*',
+                                 action='store',
+                                 help='allows to pass more than one website to check')
     argument_parser.add_argument('-f',
-                           type=argparse.FileType('r'))
+                                 type=argparse.FileType('r'))
     argument_parser.add_argument('-db',
-                           action='store_true',
-                           help='store returned values in db')
+                                 action='store_true',
+                                 help='store returned values in db')
     parsedargs = argument_parser.parse_args()
     return process_input_arguments(parsedargs)
+
 
 def process_input_arguments(parsed_args) -> dict:
     database_send_multiple = False

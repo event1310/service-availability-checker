@@ -20,7 +20,7 @@ def mock_process_sites_from_file(currserver: str) -> dict:
     validserver = check_address_validity(currserver.strip('\n'))
     if len(currserver) > 3 and validserver:
         classinstance = website_status_checker.ConnectionInstance()
-        return {currserver: classinstance.send_GET_request(validserver)}
+        return {currserver: classinstance.send_get_request(validserver)}
 
 
 def mock_file_argument_parser(mocktests: str) -> list:
