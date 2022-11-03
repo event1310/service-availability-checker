@@ -19,6 +19,7 @@ To check multiple websites passed to CLI directly, use *-l* argument instead:
 ```python
 python runchecker.py -l google.com http://facebook.com https://youtube.com
 ```
+*Note: all above sites examples (with https, http or without) are valid urls*
 
 Using *-f* allows you to process multiple websites from *.txt* file
 ```python
