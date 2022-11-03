@@ -35,7 +35,7 @@ Will send current statuses of top 50 valid websites based on popularity into the
 
 # Running the tool
 Unit tests were made using pytest framework.\
-Command below runs test cases and generates test report in *report.html* file using command below:
+Command below runs test cases and generates test report in *report.html* file:
 ```python
 pytest runtests.py --html=report.html
 ```
