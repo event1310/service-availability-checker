@@ -1,8 +1,9 @@
 from tests.test_servicechecker import *
 
 if __name__ == '__main__':
-    test_single_valid_connection()
-    test_single_invalid_connection()
-    test_multiple_valid_two_connections()
-    test_multiple_invalid_one_connection()
-    test_connection_to_server_from_textfile()
+    test_single_valid_url()
+    test_single_invalid_url()
+    test_multiple_valid_two_url()
+    test_multiple_one_invalid_url()
+    test_multiple_one_invalidformat_url()
+    test_multiple_url_extfile()
