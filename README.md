@@ -34,7 +34,7 @@ python runchecker.py -f top50sites.txt -db
 Will send current statuses of top 50 valid websites based on popularity into the database.
 
 
-# Running the tool
+# Running tests
 Unit tests were made using pytest framework.\
 Command below runs test cases and generates test report in *report.html* file:
 ```python
@@ -43,5 +43,5 @@ pytest runtests.py --html=report.html
 
 
 # Setting up the PostgreSQL database
-to start the database, run docker-compose.yml file located in db/ folder
-
+Tto start the database, run docker-compose.yml file located in *db/* folder\
+Database settings can be found and set in *db/dbconfig.ini*
