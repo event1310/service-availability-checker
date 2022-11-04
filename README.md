@@ -26,13 +26,11 @@ Using *-f* allows you to process multiple websites from *.txt* file
 python runchecker.py -f top50sites.txt
 ```
 
-Adding *-db* sends the statuses of websites into our PostgreSQL database.
+Adding *-db* sends the statuses of websites into our PostgreSQL database.\
+*Example: using -db on top50sites.txt will result in sending current statuses of websites from txt file into the database.*
 ```python
 python runchecker.py -f top50sites.txt -db
 ```
-
-Will send current statuses of top 50 valid websites based on popularity into the database.
-
 
 # Running tests
 Unit tests were made using pytest framework.\
